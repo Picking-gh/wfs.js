@@ -1,7 +1,7 @@
 {
   "name": "wfs.js",
   "version": "",
-  "license": "",
+  "license": " BSD-2-Clause",
   "description": "",
   "homepage": "https://github.com/ChihChengYang",
   "authors": "Jeff Yang",
@@ -30,6 +30,7 @@
     "rimraf": ""
   },
   "dependencies": {
-    "@babel/polyfill": "^7.7.0"
+    "@babel/polyfill": "^7.7.0",
+    "core-js": "^3.4.1"
   }
 }
