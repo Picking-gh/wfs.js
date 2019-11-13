@@ -7,27 +7,36 @@ import EventHandler from '../event-handler';
 import MP4Remuxer from '../remux/mp4-remuxer';
 
 class h264Demuxer extends EventHandler {
-  
-  constructor(wfs, config=null) {
-    super(wfs, 
+
+  constructor(wfs, config = null) {
+    super(wfs,
       Event.H264_DATA_PARSED);
 
     this.config = this.wfs.config || config;
     this.wfs = wfs;
     this.id = 'main';
- 
-    this.remuxer = new MP4Remuxer(this.wfs, this.id , this.config);   
-    this.contiguous = true; 
+
+    this.remuxer = new MP4Remuxer(this.wfs, this.id, this.config);
+    this.contiguous = true;
     this.timeOffset = 1;
     this.sn = 0;
-    this.TIMESCALE = 90000; 
+    this.TIMESCALE = 90000;
     this.timestamp = 0;
-    this.scaleFactor = this.TIMESCALE /1000;
-    this.H264_TIMEBASE = 3000;
-    this._avcTrack = {container : 'video/mp2t', type: 'video', id :1, sequenceNumber: 0,
-     samples : [], len : 0, nbNalu : 0, dropped : 0, count : 0 };
+    this.scaleFactor = this.TIMESCALE / 1000;
+    this.H264_TIMEBASE = 3600;
+    this._avcTrack = {
+      container: 'video/mp4',
+      type: 'video',
+      id: 1,
+      sequenceNumber: 0,
+      samples: [],
+      len: 0,
+      nbNalu: 0,
+      dropped: 0,
+      count: 0
+    };
     this.browserType = 0;
-    if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1){
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
       this.browserType = 1;
     }
   }
@@ -35,19 +44,17 @@ class h264Demuxer extends EventHandler {
   destroy() {
     EventHandler.prototype.destroy.call(this);
   }
- 
+
   getTimestampM() {
     this.timestamp += this.H264_TIMEBASE;
-    return  this.timestamp;
+    return this.timestamp;
   }
 
-  onH264DataParsed(event){ 
-    this._parseAVCTrack( event.data); 
-    if (this.browserType === 1 || this._avcTrack.samples.length >= 20){ // Firefox
-      this.remuxer.pushVideo(0, this.sn, this._avcTrack, this.timeOffset, this.contiguous);
-      this.sn += 1;
-    }
-  } 
+  onH264DataParsed(event) {
+    this._parseAVCTrack(event.data);
+    this.remuxer.pushVideo(0, this.sn, this._avcTrack, this.timeOffset, this.contiguous);
+    this.sn += 1;
+  }
 
   _parseAVCTrack(array) {
     var track = this._avcTrack,
@@ -60,19 +67,27 @@ class h264Demuxer extends EventHandler {
       expGolombDecoder,
       avcSample,
       push,
-      i;    
+      i;
     var debugString = '';
-    var pushAccesUnit = function() {
-      if (units2.length) { 
+    var pushAccesUnit = function () {
+      if (units2.length) {
         if (!this.config.forceKeyFrameOnDiscontinuity ||
-            key === true ||
-            (track.sps && (samples.length || this.contiguous))) { 
+          key === true ||
+          (track.sps && (samples.length || this.contiguous))) {
           var tss = this.getTimestampM();
-          avcSample = {units: { units : units2, length : length}, pts: tss, dts: tss, key: key};
+          avcSample = {
+            units: {
+              units: units2,
+              length: length
+            },
+            pts: tss,
+            dts: tss,
+            key: key
+          };
           samples.push(avcSample);
           track.len += length;
           track.nbNalu += units2.length;
-        } else { 
+        } else {
           track.dropped++;
         }
         units2 = [];
@@ -81,42 +96,42 @@ class h264Demuxer extends EventHandler {
     }.bind(this);
 
     units.forEach(unit => {
-      switch(unit.type) {
+      switch (unit.type) {
         //NDR
-         case 1:
-           push = true;
-           if(debug) {
+        case 1:
+          push = true;
+          if (debug) {
             debugString += 'NDR ';
-           }
-           break;
-        //IDR
+          }
+          break;
+          //IDR
         case 5:
           push = true;
-          if(debug) {
+          if (debug) {
             debugString += 'IDR ';
-          } 
+          }
           key = true;
           break;
-        //SEI
+          //SEI
         case 6:
           unit.data = this.discardEPB(unit.data);
           expGolombDecoder = new ExpGolomb(unit.data);
           // skip frameType
           expGolombDecoder.readUByte();
           break;
-        //SPS
+          //SPS
         case 7:
           push = false;
-          if(debug) {
+          if (debug) {
             debugString += 'SPS ';
           }
-          if(!track.sps) {
+          if (!track.sps) {
             expGolombDecoder = new ExpGolomb(unit.data);
             var config = expGolombDecoder.readSPS();
             track.width = config.width;
             track.height = config.height;
             track.sps = [unit.data];
-            track.duration = 0; 
+            track.duration = 0;
             var codecarray = unit.data.subarray(1, 4);
             var codecstring = 'avc1.';
             for (i = 0; i < 3; i++) {
@@ -126,53 +141,58 @@ class h264Demuxer extends EventHandler {
               }
               codecstring += h;
             }
-            track.codec = codecstring;         
-            this.wfs.trigger(Event.BUFFER_RESET, {  mimeType:  track.codec } ); 
+            track.codec = codecstring;
+            this.wfs.trigger(Event.BUFFER_RESET, {
+              mimeType: track.codec
+            });
             push = true;
           }
           break;
-        //PPS
+          //PPS
         case 8:
           push = false;
-          if(debug) {
+          if (debug) {
             debugString += 'PPS ';
           }
           if (!track.pps) {
             track.pps = [unit.data];
-             push = true;
+            push = true;
           }
-          break; 
+          break;
         case 9:
           push = false;
-          if(debug) {
+          if (debug) {
             debugString += 'AUD ';
           }
           pushAccesUnit();
-          break;      
+          break;
         default:
           push = false;
           debugString += 'unknown NAL ' + unit.type + ' ';
           break;
       }
-    
-      if(push) {
+
+      if (push) {
         units2.push(unit);
-        length+=unit.data.byteLength; 
+        length += unit.data.byteLength;
       }
-    
+
     });
-    
-    if(debug || debugString.length) {
+
+    if (debug || debugString.length) {
       logger.log(debugString);
     }
-    
+
     pushAccesUnit();
-   
+
   }
-  
+
   _parseAVCNALu(array) {
-    var i = 0, len = array.byteLength, value, overflow, state = 0; //state = this.avcNaluState;
-    var units = [], unit, unitType, lastUnitStart, lastUnitType; 
+    var i = 0,
+      len = array.byteLength,
+      value, overflow, state = 0; //state = this.avcNaluState;
+    var units = [],
+      unit, unitType, lastUnitStart, lastUnitType;
     while (i < len) {
       value = array[i++];
       // finding 3 or 4-byte start codes (00 00 01 OR 00 00 00 01)
@@ -183,7 +203,7 @@ class h264Demuxer extends EventHandler {
           }
           break;
         case 1:
-          if( value === 0) {
+          if (value === 0) {
             state = 2;
           } else {
             state = 0;
@@ -191,15 +211,17 @@ class h264Demuxer extends EventHandler {
           break;
         case 2:
         case 3:
-          if( value === 0) {
+          if (value === 0) {
             state = 3;
           } else if (value === 1 && i < len) {
             unitType = array[i] & 0x1f;
             if (lastUnitStart) {
-              unit = {data: array.subarray(lastUnitStart, i - state - 1), type: lastUnitType}; 
-              units.push(unit); 
-            } else { 
-            }
+              unit = {
+                data: array.subarray(lastUnitStart, i - state - 1),
+                type: lastUnitType
+              };
+              units.push(unit);
+            } else {}
             lastUnitStart = i;
             lastUnitType = unitType;
             state = 0;
@@ -212,9 +234,13 @@ class h264Demuxer extends EventHandler {
       }
     }
 
-    if (lastUnitStart) { 
-      unit = {data: array.subarray(lastUnitStart, len), type: lastUnitType, state : state};
-      units.push(unit); 
+    if (lastUnitStart) {
+      unit = {
+        data: array.subarray(lastUnitStart, len),
+        type: lastUnitType,
+        state: state
+      };
+      units.push(unit);
     }
 
     return units;
@@ -225,14 +251,14 @@ class h264Demuxer extends EventHandler {
    */
   discardEPB(data) {
     var length = data.byteLength,
-        EPBPositions = [],
-        i = 1,
-        newLength, newData;
+      EPBPositions = [],
+      i = 1,
+      newLength, newData;
     // Find all `Emulation Prevention Bytes`
     while (i < length - 2) {
       if (data[i] === 0 &&
-          data[i + 1] === 0 &&
-          data[i + 2] === 0x03) {
+        data[i + 1] === 0 &&
+        data[i + 2] === 0x03) {
         EPBPositions.push(i + 2);
         i += 2;
       } else {
@@ -261,8 +287,7 @@ class h264Demuxer extends EventHandler {
     return newData;
   }
 
- 
+
 }
 
 export default h264Demuxer;
-

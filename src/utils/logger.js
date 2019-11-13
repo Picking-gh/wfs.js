@@ -23,15 +23,15 @@ let exportedLogger = fakeLogger;
 // }
 
 function formatMsg(type, msg) {
-  msg = '[' +  type + '] > ' + msg;
+  msg = '[' + type + '] > ' + msg;
   return msg;
 }
 
 function consolePrintFn(type) {
   const func = window.console[type];
   if (func) {
-    return function(...args) {
-      if(args[0]) {
+    return function (...args) {
+      if (args[0]) {
         args[0] = formatMsg(type, args[0]);
       }
       func.apply(window.console, args);
@@ -41,12 +41,12 @@ function consolePrintFn(type) {
 }
 
 function exportLoggerFunctions(debugConfig, ...functions) {
-  functions.forEach(function(type) {
+  functions.forEach(function (type) {
     exportedLogger[type] = debugConfig[type] ? debugConfig[type].bind(debugConfig) : consolePrintFn(type);
   });
 }
 
-export var enableLogs = function(debugConfig) {
+export var enableLogs = function (debugConfig) {
   if (debugConfig === true || typeof debugConfig === 'object') {
     exportLoggerFunctions(debugConfig,
       // Remove out from list here to hard-disable a log-level
@@ -60,12 +60,11 @@ export var enableLogs = function(debugConfig) {
     // Some browsers don't allow to use bind on console object anyway
     // fallback to default if needed
     try {
-     exportedLogger.log();
+      exportedLogger.log();
     } catch (e) {
       exportedLogger = fakeLogger;
     }
-  }
-  else {
+  } else {
     exportedLogger = fakeLogger;
   }
 };

@@ -1,9 +1,8 @@
 /*
-*
-* All objects in the event handling chain should inherit from this class
-*
-*/ 
-import Event from './events';
+ *
+ * All objects in the event handling chain should inherit from this class
+ *
+ */
 
 class EventHandler {
 
@@ -26,7 +25,7 @@ class EventHandler {
 
   registerListeners() {
     if (this.isEventHandler()) {
-      this.handledEvents.forEach(function(event) {
+      this.handledEvents.forEach(function (event) {
         if (event === 'wfsEventGeneric') {
           //throw new Error('Forbidden event name: ' + event);
         }
@@ -37,7 +36,7 @@ class EventHandler {
 
   unregisterListeners() {
     if (this.isEventHandler()) {
-      this.handledEvents.forEach(function(event) {
+      this.handledEvents.forEach(function (event) {
         this.wfs.off(event, this.onEvent);
       }.bind(this));
     }
@@ -51,7 +50,7 @@ class EventHandler {
   }
 
   onEventGeneric(event, data) {
-    var eventToFunction = function(event, data) {
+    var eventToFunction = function (event, data) {
       var funcName = 'on' + event.replace('wfs', '');
       if (typeof this[funcName] !== 'function') {
         //throw new Error(`Event ${event} has no generic handler in this ${this.constructor.name} class (tried ${funcName})`);
@@ -62,7 +61,7 @@ class EventHandler {
       eventToFunction.call(this, event, data).call();
     } catch (err) {
       console.log(`internal error happened while processing ${event}:${err.message}`);
-   //   this.hls.trigger(Event.ERROR, {type: ErrorTypes.OTHER_ERROR, details: ErrorDetails.INTERNAL_EXCEPTION, fatal: false, event : event, err : err});
+      //   this.hls.trigger(Event.ERROR, {type: ErrorTypes.OTHER_ERROR, details: ErrorDetails.INTERNAL_EXCEPTION, fatal: false, event : event, err : err});
     }
   }
 }

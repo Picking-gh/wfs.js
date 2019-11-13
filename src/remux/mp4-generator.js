@@ -1,6 +1,6 @@
 /**
  * Generate MP4 Box
-*/
+ */
 
 //import Hex from '../utils/hex';
 class MP4 {
@@ -127,10 +127,11 @@ class MP4 {
     MP4.STSD = new Uint8Array([
       0x00, // version 0
       0x00, 0x00, 0x00, // flags
-      0x00, 0x00, 0x00, 0x01]);// entry_count
+      0x00, 0x00, 0x00, 0x01
+    ]); // entry_count
 
-    var majorBrand = new Uint8Array([105,115,111,109]); // isom
-    var avc1Brand = new Uint8Array([97,118,99,49]); // avc1
+    var majorBrand = new Uint8Array([105, 115, 111, 109]); // isom
+    var avc1Brand = new Uint8Array([97, 118, 99, 49]); // avc1
     var minorVersion = new Uint8Array([0, 0, 0, 1]);
 
     MP4.FTYP = MP4.box(MP4.types.ftyp, majorBrand, minorVersion, majorBrand, avc1Brand);
@@ -138,12 +139,12 @@ class MP4 {
   }
 
   static box(type) {
-  var
-    payload = Array.prototype.slice.call(arguments, 1),
-    size = 8,
-    i = payload.length,
-    len = i,
-    result;
+    var
+      payload = Array.prototype.slice.call(arguments, 1),
+      size = 8,
+      i = payload.length,
+      len = i,
+      result;
     // calculate the total size we need to allocate
     while (i--) {
       size += payload[i].byteLength;
@@ -152,7 +153,7 @@ class MP4 {
     result[0] = (size >> 24) & 0xff;
     result[1] = (size >> 16) & 0xff;
     result[2] = (size >> 8) & 0xff;
-    result[3] = size  & 0xff;
+    result[3] = size & 0xff;
     result.set(type, 4);
     // copy the payload into the result
     for (i = 0, size = 8; i < len; i++) {
@@ -168,7 +169,7 @@ class MP4 {
   }
 
   static mdat(data) {
-  //  console.log( "mdat==> ",data.length );
+    //  console.log( "mdat==> ",data.length );
     return MP4.box(MP4.types.mdat, data);
   }
 
@@ -181,11 +182,11 @@ class MP4 {
       0x00, 0x00, 0x00, 0x03, // modification_time
       (timescale >> 24) & 0xFF,
       (timescale >> 16) & 0xFF,
-      (timescale >>  8) & 0xFF,
+      (timescale >> 8) & 0xFF,
       timescale & 0xFF, // timescale
       (duration >> 24),
       (duration >> 16) & 0xFF,
-      (duration >>  8) & 0xFF,
+      (duration >> 8) & 0xFF,
       duration & 0xFF, // duration
       0x55, 0xc4, // 'und' language (undetermined)
       0x00, 0x00
@@ -202,7 +203,7 @@ class MP4 {
       0x00, 0x00, 0x00, // flags
       (sequenceNumber >> 24),
       (sequenceNumber >> 16) & 0xFF,
-      (sequenceNumber >>  8) & 0xFF,
+      (sequenceNumber >> 8) & 0xFF,
       sequenceNumber & 0xFF, // sequence_number
     ]));
   }
@@ -216,11 +217,11 @@ class MP4 {
   }
 
   static moof(sn, baseMediaDecodeTime, track) {
-    return MP4.box(MP4.types.moof, MP4.mfhd(sn), MP4.traf(track,baseMediaDecodeTime));
+    return MP4.box(MP4.types.moof, MP4.mfhd(sn), MP4.traf(track, baseMediaDecodeTime));
   }
-/**
- * @param tracks... (optional) {array} the tracks associated with this movie
- */
+  /**
+   * @param tracks... (optional) {array} the tracks associated with this movie
+   */
   static moov(tracks) {
     var
       i = tracks.length,
@@ -244,8 +245,8 @@ class MP4 {
     return MP4.box.apply(null, [MP4.types.mvex].concat(boxes));
   }
 
-  static mvhd(timescale,duration) {
-    duration*=timescale;
+  static mvhd(timescale, duration) {
+    duration = 0;
     var
       bytes = new Uint8Array([
         0x00, // version 0
@@ -254,11 +255,11 @@ class MP4 {
         0x00, 0x00, 0x00, 0x02, // modification_time
         (timescale >> 24) & 0xFF,
         (timescale >> 16) & 0xFF,
-        (timescale >>  8) & 0xFF,
+        (timescale >> 8) & 0xFF,
         timescale & 0xFF, // timescale
         (duration >> 24) & 0xFF,
         (duration >> 16) & 0xFF,
-        (duration >>  8) & 0xFF,
+        (duration >> 8) & 0xFF,
         duration & 0xFF, // duration
         0x00, 0x01, 0x00, 0x00, // 1.0 rate
         0x01, 0x00, // 1.0 volume
@@ -308,7 +309,9 @@ class MP4 {
   }
 
   static avc1(track) {
-    var sps = [], pps = [], i, data, len;
+    var sps = [],
+      pps = [],
+      i, data, len;
     // assemble the SPSs
 
     for (i = 0; i < track.sps.length; i++) {
@@ -329,17 +332,17 @@ class MP4 {
     }
 
     var avcc = MP4.box(MP4.types.avcC, new Uint8Array([
-            0x01,   // version
-            sps[3], // profile
-            sps[4], // profile compat
-            sps[5], // level
-            0xfc | 3, // lengthSizeMinusOne, hard-coded to 4 bytes
-            0xE0 | track.sps.length // 3bit reserved (111) + numOfSequenceParameterSets
-          ].concat(sps).concat([
-            track.pps.length // numOfPictureParameterSets
-          ]).concat(pps))), // "PPS"
-        width = track.width,
-        height = track.height;
+        0x01, // version
+        sps[3], // profile
+        sps[4], // profile compat
+        sps[5], // level
+        0xfc | 3, // lengthSizeMinusOne, hard-coded to 4 bytes
+        0xE0 | track.sps.length // 3bit reserved (111) + numOfSequenceParameterSets
+      ].concat(sps).concat([
+        track.pps.length // numOfPictureParameterSets
+      ]).concat(pps))), // "PPS"
+      width = track.width,
+      height = track.height;
     //console.log('avcc:' + Hex.hexDump(avcc));
     return MP4.box(MP4.types.avc1, new Uint8Array([
         0x00, 0x00, 0x00, // reserved
@@ -367,15 +370,17 @@ class MP4 {
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, // compressorname
-        0x00, 0x18,   // depth = 24
-        0x11, 0x11]), // pre_defined = -1
-          avcc,
-          MP4.box(MP4.types.btrt, new Uint8Array([
-            0x00, 0x1c, 0x9c, 0x80, // bufferSizeDB
-            0x00, 0x2d, 0xc6, 0xc0, // maxBitrate
-            0x00, 0x2d, 0xc6, 0xc0])) // avgBitrate
-          );
-  }       
+        0x00, 0x18, // depth = 24
+        0x11, 0x11
+      ]), // pre_defined = -1
+      avcc,
+      MP4.box(MP4.types.btrt, new Uint8Array([
+        0x00, 0x1c, 0x9c, 0x80, // bufferSizeDB
+        0x00, 0x2d, 0xc6, 0xc0, // maxBitrate
+        0x00, 0x2d, 0xc6, 0xc0
+      ])) // avgBitrate
+    );
+  }
 
   static esds(track) {
     var configlen = track.config.length;
@@ -384,12 +389,12 @@ class MP4 {
       0x00, 0x00, 0x00, // flags
 
       0x03, // descriptor_type
-      0x17+configlen, // length
+      0x17 + configlen, // length
       0x00, 0x01, //es_id
       0x00, // stream_priority
 
       0x04, // descriptor_type
-      0x0f+configlen, // length
+      0x0f + configlen, // length
       0x40, //codec : mpeg4_audio
       0x15, // stream_type
       0x00, 0x00, 0x00, // buffer_size
@@ -397,23 +402,24 @@ class MP4 {
       0x00, 0x00, 0x00, 0x00, // avgBitrate
 
       0x05 // descriptor_type
-      ].concat([configlen]).concat(track.config).concat([0x06, 0x01, 0x02])); // GASpecificConfig)); // length + audio config descriptor
+    ].concat([configlen]).concat(track.config).concat([0x06, 0x01, 0x02])); // GASpecificConfig)); // length + audio config descriptor
   }
 
   static mp4a(track) {
     var audiosamplerate = track.audiosamplerate;
-      return MP4.box(MP4.types.mp4a, new Uint8Array([
-      0x00, 0x00, 0x00, // reserved
-      0x00, 0x00, 0x00, // reserved
-      0x00, 0x01, // data_reference_index
-      0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x00, 0x00, // reserved
-      0x00, track.channelCount, // channelcount
-      0x00, 0x10, // sampleSize:16bits
-      0x00, 0x00, 0x00, 0x00, // reserved2
-      (audiosamplerate >> 8) & 0xFF,
-      audiosamplerate & 0xff, //
-      0x00, 0x00]),
+    return MP4.box(MP4.types.mp4a, new Uint8Array([
+        0x00, 0x00, 0x00, // reserved
+        0x00, 0x00, 0x00, // reserved
+        0x00, 0x01, // data_reference_index
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, // reserved
+        0x00, track.channelCount, // channelcount
+        0x00, 0x10, // sampleSize:16bits
+        0x00, 0x00, 0x00, 0x00, // reserved2
+        (audiosamplerate >> 8) & 0xFF,
+        audiosamplerate & 0xff, //
+        0x00, 0x00
+      ]),
       MP4.box(MP4.types.esds, MP4.esds(track)));
   }
 
@@ -427,11 +433,11 @@ class MP4 {
 
   static tkhd(track) {
     var id = track.id,
-        duration = track.duration*track.timescale,
-        width = track.width,
-        height = track.height;
+      duration = track.duration * track.timescale,
+      width = track.width,
+      height = track.height;
 
-     //   console.log( "tkhd==> ",track.id, track.duration, track.timescale, width,height );
+    //   console.log( "tkhd==> ",track.id, track.duration, track.timescale, width,height );
 
     return MP4.box(MP4.types.tkhd, new Uint8Array([
       0x00, // version 0
@@ -445,7 +451,7 @@ class MP4 {
       0x00, 0x00, 0x00, 0x00, // reserved
       (duration >> 24),
       (duration >> 16) & 0xFF,
-      (duration >>  8) & 0xFF,
+      (duration >> 8) & 0xFF,
       duration & 0xFF, // duration
       0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, // reserved
@@ -471,40 +477,40 @@ class MP4 {
     ]));
   }
 
-  static traf(track,baseMediaDecodeTime) {
+  static traf(track, baseMediaDecodeTime) {
     var sampleDependencyTable = MP4.sdtp(track),
-        id = track.id;
-      
+      id = track.id;
 
 
-     //  console.log( "traf==> ",id ,baseMediaDecodeTime);
+
+    //  console.log( "traf==> ",id ,baseMediaDecodeTime);
 
     return MP4.box(MP4.types.traf,
-               MP4.box(MP4.types.tfhd, new Uint8Array([
-                 0x00, // version 0
-                 0x00, 0x00, 0x00, // flags
-                 (id >> 24),
-                 (id >> 16) & 0XFF,
-                 (id >> 8) & 0XFF,
-                 (id & 0xFF) // track_ID
-               ])),
-               MP4.box(MP4.types.tfdt, new Uint8Array([
-                 0x00, // version 0
-                 0x00, 0x00, 0x00, // flags
-                 (baseMediaDecodeTime >>24),
-                 (baseMediaDecodeTime >> 16) & 0XFF,
-                 (baseMediaDecodeTime >> 8) & 0XFF,
-                 (baseMediaDecodeTime & 0xFF) // baseMediaDecodeTime
-               ])),
-               MP4.trun(track,
-                    sampleDependencyTable.length +
-                    16 + // tfhd
-                    16 + // tfdt
-                    8 +  // traf header
-                    16 + // mfhd
-                    8 +  // moof header
-                    8),  // mdat header
-               sampleDependencyTable);
+      MP4.box(MP4.types.tfhd, new Uint8Array([
+        0x00, // version 0
+        0x00, 0x00, 0x00, // flags
+        (id >> 24),
+        (id >> 16) & 0XFF,
+        (id >> 8) & 0XFF,
+        (id & 0xFF) // track_ID
+      ])),
+      MP4.box(MP4.types.tfdt, new Uint8Array([
+        0x00, // version 0
+        0x00, 0x00, 0x00, // flags
+        (baseMediaDecodeTime >> 24),
+        (baseMediaDecodeTime >> 16) & 0XFF,
+        (baseMediaDecodeTime >> 8) & 0XFF,
+        (baseMediaDecodeTime & 0xFF) // baseMediaDecodeTime
+      ])),
+      MP4.trun(track,
+        sampleDependencyTable.length +
+        16 + // tfhd
+        16 + // tfdt
+        8 + // traf header
+        16 + // mfhd
+        8 + // moof header
+        8), // mdat header
+      sampleDependencyTable);
   }
 
   /**
@@ -522,10 +528,10 @@ class MP4 {
     return MP4.box(MP4.types.trex, new Uint8Array([
       0x00, // version 0
       0x00, 0x00, 0x00, // flags
-     (id >> 24),
-     (id >> 16) & 0XFF,
-     (id >> 8) & 0XFF,
-     (id & 0xFF), // track_ID
+      (id >> 24),
+      (id >> 16) & 0XFF,
+      (id >> 8) & 0XFF,
+      (id & 0xFF), // track_ID
       0x00, 0x00, 0x00, 0x01, // default_sample_description_index
       0x00, 0x00, 0x00, 0x00, // default_sample_duration
       0x00, 0x00, 0x00, 0x00, // default_sample_size
@@ -534,14 +540,14 @@ class MP4 {
   }
 
   static trun(track, offset) {
-    var samples= track.samples || [],
-        len = samples.length,
-        arraylen = 12 + (16 * len),
-        array = new Uint8Array(arraylen),
-        i,sample,duration,size,flags,cts;
+    var samples = track.samples || [],
+      len = samples.length,
+      arraylen = 12 + (16 * len),
+      array = new Uint8Array(arraylen),
+      i, sample, duration, size, flags, cts;
 
-//sample = samples[0];
- //       console.log( "trun==> ",sample.duration, sample.cts ,sample.size,len );
+    //sample = samples[0];
+    //       console.log( "trun==> ",sample.duration, sample.cts ,sample.size,len );
 
     offset += 8 + arraylen;
     array.set([
@@ -555,7 +561,7 @@ class MP4 {
       (offset >>> 16) & 0xFF,
       (offset >>> 8) & 0xFF,
       offset & 0xFF // data_offset
-    ],0);
+    ], 0);
     for (i = 0; i < len; i++) {
       sample = samples[i];
       duration = sample.duration;
@@ -573,16 +579,16 @@ class MP4 {
         size & 0xFF, // sample_size
         (flags.isLeading << 2) | flags.dependsOn,
         (flags.isDependedOn << 6) |
-          (flags.hasRedundancy << 4) |
-          (flags.paddingValue << 1) |
-          flags.isNonSync,
+        (flags.hasRedundancy << 4) |
+        (flags.paddingValue << 1) |
+        flags.isNonSync,
         flags.degradPrio & 0xF0 << 8,
         flags.degradPrio & 0x0F, // sample_flags
         (cts >>> 24) & 0xFF,
         (cts >>> 16) & 0xFF,
         (cts >>> 8) & 0xFF,
         cts & 0xFF // sample_composition_time_offset
-      ],12+16*i);
+      ], 12 + 16 * i);
     }
     return MP4.box(MP4.types.trun, array);
   }
@@ -591,12 +597,13 @@ class MP4 {
     if (!MP4.types) {
       MP4.init();
     }
-    var movie = MP4.moov(tracks), result;
+    var movie = MP4.moov(tracks),
+      result;
     result = new Uint8Array(MP4.FTYP.byteLength + movie.byteLength);
     result.set(MP4.FTYP);
     result.set(movie, MP4.FTYP.byteLength);
 
- 
+
     return result;
   }
 }

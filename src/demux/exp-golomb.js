@@ -1,8 +1,8 @@
 /**
  * Parser for exponential Golomb codes, a variable-bitwidth number encoding scheme used by h264.
-*/
+ */
 
-import {logger} from '../utils/logger';
+import logger from '../utils/logger';
 
 class ExpGolomb {
 
@@ -129,7 +129,7 @@ class ExpGolomb {
   readUShort() {
     return this.readBits(16);
   }
-    // ():int
+  // ():int
   readUInt() {
     return this.readBits(32);
   }
@@ -172,7 +172,7 @@ class ExpGolomb {
       frameCropTopOffset = 0,
       frameCropBottomOffset = 0,
       sarScale = 1,
-      profileIdc,profileCompat,levelIdc,
+      profileIdc, profileCompat, levelIdc,
       numRefFramesInPicOrderCntCycle, picWidthInMbsMinus1,
       picHeightInMapUnitsMinus1,
       frameMbsOnlyFlag,
@@ -186,14 +186,14 @@ class ExpGolomb {
     this.skipUEG(); // seq_parameter_set_id
     // some profiles have more optional data we don't need
     if (profileIdc === 100 ||
-        profileIdc === 110 ||
-        profileIdc === 122 ||
-        profileIdc === 244 ||
-        profileIdc === 44  ||
-        profileIdc === 83  ||
-        profileIdc === 86  ||
-        profileIdc === 118 ||
-        profileIdc === 128) {
+      profileIdc === 110 ||
+      profileIdc === 122 ||
+      profileIdc === 244 ||
+      profileIdc === 44 ||
+      profileIdc === 83 ||
+      profileIdc === 86 ||
+      profileIdc === 118 ||
+      profileIdc === 128) {
       var chromaFormatIdc = this.readUEG();
       if (chromaFormatIdc === 3) {
         this.skipBits(1); // separate_colour_plane_flag
@@ -223,7 +223,7 @@ class ExpGolomb {
       this.skipEG(); // offset_for_non_ref_pic
       this.skipEG(); // offset_for_top_to_bottom_field
       numRefFramesInPicOrderCntCycle = this.readUEG();
-      for(i = 0; i < numRefFramesInPicOrderCntCycle; i++) {
+      for (i = 0; i < numRefFramesInPicOrderCntCycle; i++) {
         this.skipEG(); // offset_for_ref_frame[ i ]
       }
     }
@@ -249,22 +249,54 @@ class ExpGolomb {
         let sarRatio;
         const aspectRatioIdc = this.readUByte();
         switch (aspectRatioIdc) {
-          case 1: sarRatio = [1,1]; break;
-          case 2: sarRatio = [12,11]; break;
-          case 3: sarRatio = [10,11]; break;
-          case 4: sarRatio = [16,11]; break;
-          case 5: sarRatio = [40,33]; break;
-          case 6: sarRatio = [24,11]; break;
-          case 7: sarRatio = [20,11]; break;
-          case 8: sarRatio = [32,11]; break;
-          case 9: sarRatio = [80,33]; break;
-          case 10: sarRatio = [18,11]; break;
-          case 11: sarRatio = [15,11]; break;
-          case 12: sarRatio = [64,33]; break;
-          case 13: sarRatio = [160,99]; break;
-          case 14: sarRatio = [4,3]; break;
-          case 15: sarRatio = [3,2]; break;
-          case 16: sarRatio = [2,1]; break;
+          case 1:
+            sarRatio = [1, 1];
+            break;
+          case 2:
+            sarRatio = [12, 11];
+            break;
+          case 3:
+            sarRatio = [10, 11];
+            break;
+          case 4:
+            sarRatio = [16, 11];
+            break;
+          case 5:
+            sarRatio = [40, 33];
+            break;
+          case 6:
+            sarRatio = [24, 11];
+            break;
+          case 7:
+            sarRatio = [20, 11];
+            break;
+          case 8:
+            sarRatio = [32, 11];
+            break;
+          case 9:
+            sarRatio = [80, 33];
+            break;
+          case 10:
+            sarRatio = [18, 11];
+            break;
+          case 11:
+            sarRatio = [15, 11];
+            break;
+          case 12:
+            sarRatio = [64, 33];
+            break;
+          case 13:
+            sarRatio = [160, 99];
+            break;
+          case 14:
+            sarRatio = [4, 3];
+            break;
+          case 15:
+            sarRatio = [3, 2];
+            break;
+          case 16:
+            sarRatio = [2, 1];
+            break;
           case 255: {
             sarRatio = [this.readUByte() << 8 | this.readUByte(), this.readUByte() << 8 | this.readUByte()];
             break;
@@ -277,7 +309,7 @@ class ExpGolomb {
     }
     return {
       width: Math.ceil((((picWidthInMbsMinus1 + 1) * 16) - frameCropLeftOffset * 2 - frameCropRightOffset * 2) * sarScale),
-      height: ((2 - frameMbsOnlyFlag) * (picHeightInMapUnitsMinus1 + 1) * 16) - ((frameMbsOnlyFlag? 2 : 4) * (frameCropTopOffset + frameCropBottomOffset))
+      height: ((2 - frameMbsOnlyFlag) * (picHeightInMapUnitsMinus1 + 1) * 16) - ((frameMbsOnlyFlag ? 2 : 4) * (frameCropTopOffset + frameCropBottomOffset))
     };
   }
 
