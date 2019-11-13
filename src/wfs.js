@@ -20,7 +20,7 @@ class Wfs {
   static isSupported() {
     return (window.MediaSource &&
       typeof window.MediaSource.isTypeSupported === 'function' &&
-      window.MediaSource.isTypeSupported('video/mp4; codecs="avc1.42c01f,mp4a.40.2"'));
+      window.MediaSource.isTypeSupported('video/mp4;'));
   }
 
   static get Events() {
