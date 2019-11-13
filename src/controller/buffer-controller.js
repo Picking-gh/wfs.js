@@ -32,7 +32,6 @@ class BufferController extends EventHandler {
     }
     this.mediaType = 'H264Raw';
 
-    this.websocketName = undefined;
     this.channelName = undefined;
   }
 
@@ -43,7 +42,6 @@ class BufferController extends EventHandler {
   onMediaAttaching(data) {
     let media = this.media = data.media;
     this.mediaType = data.mediaType;
-    this.websocketName = data.websocketName;
     this.channelName = data.channelName;
     if (media) {
       // setup the media source
@@ -103,8 +101,7 @@ class BufferController extends EventHandler {
     this.wfs.trigger(Event.MEDIA_ATTACHED, {
       media: this.media,
       channelName: this.channelName,
-      mediaType: this.mediaType,
-      websocketName: this.websocketName
+      mediaType: this.mediaType
     });
   }
 

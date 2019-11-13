@@ -30,24 +30,13 @@ class FlowController extends EventHandler {
   }
 
   onMediaAttached(data) {
-    if (data.websocketName != undefined) {
-      var client = new WebSocket('ws://' + this.wfs.ws_server);
-      this.wfs.attachWebsocket(client, data.channelName);
-    } else {
-      console.log('websocketName ERROE!!!');
-    }
-
+    var client = new WebSocket('ws://' + this.wfs.ws_server);
+    this.wfs.attachWebsocket(client, data.channelName);
   }
 
   onBufferCreated(data) {
     this.mediaType = data.mediaType;
   }
-
-  onFileHeadLoaded(data) {}
-
-  onFileDataLoaded(data) {}
-
-  onFileParsingData(data) {}
 
   onWebsocketAttached(data) {
     this.wfs.trigger(Event.BUFFER_APPENDING, {
@@ -82,11 +71,6 @@ class FlowController extends EventHandler {
   }
 
   onFragParsingData(data) {
-
-    if (data.type === 'video') {
-
-    }
-
     [data.data1, data.data2].forEach(buffer => {
       if (buffer) {
         this.pendingAppending++;

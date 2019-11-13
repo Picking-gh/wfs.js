@@ -4,8 +4,6 @@ module.exports = {
 
   MEDIA_ATTACHED: 'wfsMediaAttached',
 
-  FRAG_LOADING: 'wfsFragLoading',
-
   BUFFER_CREATED: 'wfsBufferCreated',
 
   BUFFER_APPENDING: 'wfsBufferAppending',

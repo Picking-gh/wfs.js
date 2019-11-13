@@ -582,7 +582,6 @@ function (_EventHandler) {
     }
 
     _this.mediaType = 'H264Raw';
-    _this.websocketName = undefined;
     _this.channelName = undefined;
     return _this;
   }
@@ -597,7 +596,6 @@ function (_EventHandler) {
     value: function onMediaAttaching(data) {
       var media = this.media = data.media;
       this.mediaType = data.mediaType;
-      this.websocketName = data.websocketName;
       this.channelName = data.channelName;
 
       if (media) {
@@ -661,8 +659,7 @@ function (_EventHandler) {
       this.wfs.trigger(_events.default.MEDIA_ATTACHED, {
         media: this.media,
         channelName: this.channelName,
-        mediaType: this.mediaType,
-        websocketName: this.websocketName
+        mediaType: this.mediaType
       });
     }
   }, {
@@ -828,27 +825,14 @@ function (_EventHandler) {
   }, {
     key: "onMediaAttached",
     value: function onMediaAttached(data) {
-      if (data.websocketName != undefined) {
-        var client = new WebSocket('ws://' + this.wfs.ws_server);
-        this.wfs.attachWebsocket(client, data.channelName);
-      } else {
-        console.log('websocketName ERROE!!!');
-      }
+      var client = new WebSocket('ws://' + this.wfs.ws_server);
+      this.wfs.attachWebsocket(client, data.channelName);
     }
   }, {
     key: "onBufferCreated",
     value: function onBufferCreated(data) {
       this.mediaType = data.mediaType;
     }
-  }, {
-    key: "onFileHeadLoaded",
-    value: function onFileHeadLoaded(data) {}
-  }, {
-    key: "onFileDataLoaded",
-    value: function onFileDataLoaded(data) {}
-  }, {
-    key: "onFileParsingData",
-    value: function onFileParsingData(data) {}
   }, {
     key: "onWebsocketAttached",
     value: function onWebsocketAttached(data) {
@@ -888,8 +872,6 @@ function (_EventHandler) {
     key: "onFragParsingData",
     value: function onFragParsingData(data) {
       var _this2 = this;
-
-      if (data.type === 'video') {}
 
       [data.data1, data.data2].forEach(function (buffer) {
         if (buffer) {
@@ -1893,7 +1875,6 @@ exports.default = _default;
 module.exports = {
   MEDIA_ATTACHING: 'wfsMediaAttaching',
   MEDIA_ATTACHED: 'wfsMediaAttached',
-  FRAG_LOADING: 'wfsFragLoading',
   BUFFER_CREATED: 'wfsBufferCreated',
   BUFFER_APPENDING: 'wfsBufferAppending',
   BUFFER_RESET: 'wfsBufferReset',
@@ -3936,14 +3917,12 @@ function () {
     value: function attachMedia(media) {
       var channelName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'tv';
       var mediaType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'H264Raw';
-      var websocketName = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'play2';
       this.mediaType = mediaType;
       this.media = media;
       this.trigger(_events.default.MEDIA_ATTACHING, {
         media: media,
         channelName: channelName,
-        mediaType: mediaType,
-        websocketName: websocketName
+        mediaType: mediaType
       });
     }
   }, {
