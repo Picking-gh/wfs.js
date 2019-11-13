@@ -83,7 +83,6 @@ class BufferController extends EventHandler {
     this.appending = false;
     this.doAppending();
     this.updateMediaElementDuration();
-
   }
 
   updateMediaElementDuration() {

@@ -5,6 +5,8 @@ html5 player for raw h.264 streams.
  
  It works by transmuxing H264 NAL unit into ISO BMFF (MP4) fragments.
 
+ Demond websockets sends one NAL at a time.
+
  Adjusted framerate to 25Hz.
 
  Adjusted to display directly.
