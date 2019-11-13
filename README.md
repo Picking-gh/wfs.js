@@ -5,15 +5,17 @@ html5 player for raw h.264 streams.
  
  It works by transmuxing H264 NAL unit into ISO BMFF (MP4) fragments.
 
- Demond websockets sends one NAL at a time.
+ Removed original websockets proxy server. I wrote another proxy to fetch and send h264 NAL unit from rtsp streams. My server sends  one NAL unit at a time, so I simplified the original code as there is no need to find units in the ws messages.
 
- Adjusted framerate to 25Hz.
+ Other changes:
+ 
+ 1. Adjusted display framerate to 25Hz according to my rtsp sources.
 
- Adjusted to display directly.
+ 2. Added ws address when init a Wfs().
 
- Added ws address when init a Wfs().
-
- Use babel 7.
+ 3. Removed all file handle things. ONLY H264 alowed.
+ 
+ 4. Change to babel 7.
     
  
 ##  Original see
