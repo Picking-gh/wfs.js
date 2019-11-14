@@ -5,7 +5,7 @@ html5 player for raw h.264 streams.
  
  It works by transmuxing H264 NAL unit into ISO BMFF (MP4) fragments.
 
- I removed the original websockets proxy server. I wrote another proxy to fetch and send h264 NAL units from rtsp streams. My server sends one or more complete NAL unit(s) at a time. So I simplified the original h264-nal-slicesreader.js as the unit always starts at the begining in a ws messages and h264-demuxer.js already does the proper search work. My server code is not based on the original one and is not included. The server side is much easier than this js code 😓.
+ I removed the original websockets proxy server. I wrote another proxy to fetch and send h264 NAL units from rtsp streams. My server sends one or more complete NAL unit(s) at a time. So I simplified the original h264-nal-slicesreader.js as the unit always starts at the begining of a ws messages and h264-demuxer.js already does the proper search work. My server code is not based on the original one and is not included. The server side is much easier than this js code 😓.
 
  Other changes:
  
