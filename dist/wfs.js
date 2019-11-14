@@ -806,7 +806,7 @@ function (_EventHandler) {
 
     _classCallCheck(this, FlowController);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(FlowController).call(this, wfs, _events.default.MEDIA_ATTACHED, _events.default.BUFFER_CREATED, _events.default.FILE_PARSING_DATA, _events.default.FILE_HEAD_LOADED, _events.default.FILE_DATA_LOADED, _events.default.WEBSOCKET_ATTACHED, _events.default.FRAG_PARSING_DATA, _events.default.FRAG_PARSING_INIT_SEGMENT));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(FlowController).call(this, wfs, _events.default.MEDIA_ATTACHED, _events.default.BUFFER_CREATED, _events.default.WEBSOCKET_ATTACHED, _events.default.FRAG_PARSING_DATA, _events.default.FRAG_PARSING_INIT_SEGMENT));
     _this.fileStart = 0;
     _this.fileEnd = 0;
     _this.pendingAppending = 0;
@@ -826,7 +826,11 @@ function (_EventHandler) {
     key: "onMediaAttached",
     value: function onMediaAttached(data) {
       var client = new WebSocket('ws://' + this.wfs.ws_server);
-      this.wfs.attachWebsocket(client, data.channelName);
+      this.wfs.trigger(_events.default.WEBSOCKET_ATTACHING, {
+        websocket: client,
+        mediaType: this.mediaType,
+        channelName: data.channelName
+      });
     }
   }, {
     key: "onBufferCreated",
@@ -1313,7 +1317,7 @@ function () {
 var _default = ExpGolomb;
 exports.default = _default;
 
-},{"../utils/logger":15}],5:[function(require,module,exports){
+},{"../utils/logger":14}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1396,6 +1400,8 @@ function (_EventHandler) {
   _createClass(h264Demuxer, [{
     key: "destroy",
     value: function destroy() {
+      this.remuxer.destroy();
+
       _eventHandler.default.prototype.destroy.call(this);
     }
   }, {
@@ -1910,7 +1916,7 @@ var _events = _interopRequireDefault(require("../events"));
 
 var _eventHandler = _interopRequireDefault(require("../event-handler"));
 
-var _h264NalSlicesreader = _interopRequireDefault(require("../utils/h264-nal-slicesreader.js"));
+var _preprocesser = _interopRequireDefault(require("../utils/preprocesser"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1944,7 +1950,7 @@ function (_EventHandler) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(WebsocketLoader).call(this, wfs, _events.default.WEBSOCKET_ATTACHING, _events.default.WEBSOCKET_DATA_UPLOADING, _events.default.WEBSOCKET_MESSAGE_SENDING));
     _this.buf = null;
-    _this.slicesReader = new _h264NalSlicesreader.default(wfs);
+    _this.preProcesser = new _preprocesser.default(wfs);
     _this.mediaType = undefined;
     _this.channelName = undefined;
     return _this;
@@ -1954,7 +1960,7 @@ function (_EventHandler) {
     key: "destroy",
     value: function destroy() {
       !!this.client && this.client.close();
-      this.slicesReader.destroy();
+      this.preProcesser.destroy();
 
       _eventHandler.default.prototype.destroy.call(this);
     }
@@ -2016,7 +2022,7 @@ function (_EventHandler) {
 var _default = WebsocketLoader;
 exports.default = _default;
 
-},{"../event-handler":7,"../events":8,"../utils/h264-nal-slicesreader.js":14}],11:[function(require,module,exports){
+},{"../event-handler":7,"../events":8,"../utils/preprocesser":15}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3557,80 +3563,7 @@ function () {
 var _default = MP4Remuxer;
 exports.default = _default;
 
-},{"../errors":6,"../events":8,"../utils/logger":15,"./aac-helper":11,"./mp4-generator":12}],14:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _events = _interopRequireDefault(require("../events"));
-
-var _eventHandler = _interopRequireDefault(require("../event-handler"));
-
-var _h264Demuxer = _interopRequireDefault(require("../demux/h264-demuxer"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var SlicesReader =
-/*#__PURE__*/
-function (_EventHandler) {
-  _inherits(SlicesReader, _EventHandler);
-
-  function SlicesReader(wfs) {
-    var _this;
-
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-    _classCallCheck(this, SlicesReader);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SlicesReader).call(this, wfs, _events.default.H264_DATA_PARSING));
-    _this.config = _this.wfs.config || config;
-    _this.h264Demuxer = new _h264Demuxer.default(wfs);
-    _this.wfs = wfs;
-    return _this;
-  }
-
-  _createClass(SlicesReader, [{
-    key: "destroy",
-    value: function destroy() {
-      _eventHandler.default.prototype.destroy.call(this);
-    }
-  }, {
-    key: "onH264DataParsing",
-    value: function onH264DataParsing(event) {
-      this.wfs.trigger(_events.default.H264_DATA_PARSED, {
-        data: event.data
-      });
-    }
-  }]);
-
-  return SlicesReader;
-}(_eventHandler.default);
-
-var _default = SlicesReader;
-exports.default = _default;
-
-},{"../demux/h264-demuxer":5,"../event-handler":7,"../events":8}],15:[function(require,module,exports){
+},{"../errors":6,"../events":8,"../utils/logger":14,"./aac-helper":11,"./mp4-generator":12}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3715,7 +3648,83 @@ exports.enableLogs = enableLogs;
 var logger = exportedLogger;
 exports.logger = logger;
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _events = _interopRequireDefault(require("../events"));
+
+var _eventHandler = _interopRequireDefault(require("../event-handler"));
+
+var _h264Demuxer = _interopRequireDefault(require("../demux/h264-demuxer"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var PreProcesser =
+/*#__PURE__*/
+function (_EventHandler) {
+  _inherits(PreProcesser, _EventHandler);
+
+  function PreProcesser(wfs) {
+    var _this;
+
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+    _classCallCheck(this, PreProcesser);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(PreProcesser).call(this, wfs, _events.default.H264_DATA_PARSING));
+    _this.config = _this.wfs.config || config;
+    _this.h264Demuxer = new _h264Demuxer.default(wfs);
+    _this.wfs = wfs;
+    return _this;
+  }
+
+  _createClass(PreProcesser, [{
+    key: "destroy",
+    value: function destroy() {
+      this.h264Demuxer.destroy();
+
+      _eventHandler.default.prototype.destroy.call(this);
+    }
+  }, {
+    key: "onH264DataParsing",
+    value: function onH264DataParsing(event) {
+      // todo: add data preprocessing code here.
+      this.wfs.trigger(_events.default.H264_DATA_PARSED, {
+        data: event.data
+      });
+    }
+  }]);
+
+  return PreProcesser;
+}(_eventHandler.default);
+
+var _default = PreProcesser;
+exports.default = _default;
+
+},{"../demux/h264-demuxer":5,"../event-handler":7,"../events":8}],16:[function(require,module,exports){
 /**
  * WFS interface, Jeff Yang 2016.10
  */
@@ -3750,7 +3759,7 @@ function () {
   _createClass(Wfs, null, [{
     key: "isSupported",
     value: function isSupported() {
-      return window.MediaSource && typeof window.MediaSource.isTypeSupported === 'function' && window.MediaSource.isTypeSupported('video/mp4;');
+      return window.MediaSource && typeof window.MediaSource.isTypeSupported === 'function' && window.MediaSource.isTypeSupported('video/mp4; codecs="avc1.42c01f,mp4a.40.2"');
     }
   }, {
     key: "version",
@@ -3771,7 +3780,6 @@ function () {
           autoStartLoad: true,
           startPosition: -1,
           debug: false,
-          fLoader: undefined,
           fragLoadingTimeOut: 20000,
           fragLoadingMaxRetry: 6,
           fragLoadingRetryDelay: 1000,
@@ -3852,15 +3860,6 @@ function () {
         media: media,
         channelName: channelName,
         mediaType: mediaType
-      });
-    }
-  }, {
-    key: "attachWebsocket",
-    value: function attachWebsocket(websocket, channelName) {
-      this.trigger(_events.default.WEBSOCKET_ATTACHING, {
-        websocket: websocket,
-        mediaType: this.mediaType,
-        channelName: channelName
       });
     }
   }]);

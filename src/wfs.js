@@ -20,7 +20,7 @@ class Wfs {
   static isSupported() {
     return (window.MediaSource &&
       typeof window.MediaSource.isTypeSupported === 'function' &&
-      window.MediaSource.isTypeSupported('video/mp4;'));
+      window.MediaSource.isTypeSupported('video/mp4; codecs="avc1.42c01f,mp4a.40.2"'));
   }
 
   static get Events() {
@@ -33,7 +33,6 @@ class Wfs {
         autoStartLoad: true,
         startPosition: -1,
         debug: false,
-        fLoader: undefined,
         fragLoadingTimeOut: 20000,
         fragLoadingMaxRetry: 6,
         fragLoadingRetryDelay: 1000,
@@ -92,14 +91,6 @@ class Wfs {
       media: media,
       channelName: channelName,
       mediaType: mediaType
-    });
-  }
-
-  attachWebsocket(websocket, channelName) {
-    this.trigger(Event.WEBSOCKET_ATTACHING, {
-      websocket: websocket,
-      mediaType: this.mediaType,
-      channelName: channelName
     });
   }
 

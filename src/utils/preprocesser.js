@@ -1,11 +1,11 @@
 /*
- * H264 NAL Slicer
+ * Hook for processing attached data on H264 NAL unit data.
  */
 import Event from '../events';
 import EventHandler from '../event-handler';
 import H264Demuxer from '../demux/h264-demuxer';
 
-class SlicesReader extends EventHandler {
+class PreProcesser extends EventHandler {
 
     constructor(wfs, config = null) {
         super(wfs, Event.H264_DATA_PARSING);
@@ -16,11 +16,14 @@ class SlicesReader extends EventHandler {
     }
 
     destroy() {
+        this.h264Demuxer.destroy();
         EventHandler.prototype.destroy.call(this);
     }
 
- 
+
     onH264DataParsing(event) {
+        // todo: add data preprocessing code here.
+
         this.wfs.trigger(Event.H264_DATA_PARSED, {
             data: event.data
         });
@@ -28,4 +31,4 @@ class SlicesReader extends EventHandler {
 
 }
 
-export default SlicesReader;
+export default PreProcesser;

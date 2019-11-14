@@ -11,9 +11,6 @@ class FlowController extends EventHandler {
     super(wfs,
       Event.MEDIA_ATTACHED,
       Event.BUFFER_CREATED,
-      Event.FILE_PARSING_DATA,
-      Event.FILE_HEAD_LOADED,
-      Event.FILE_DATA_LOADED,
       Event.WEBSOCKET_ATTACHED,
       Event.FRAG_PARSING_DATA,
       Event.FRAG_PARSING_INIT_SEGMENT);
@@ -31,7 +28,11 @@ class FlowController extends EventHandler {
 
   onMediaAttached(data) {
     var client = new WebSocket('ws://' + this.wfs.ws_server);
-    this.wfs.attachWebsocket(client, data.channelName);
+    this.wfs.trigger(Event.WEBSOCKET_ATTACHING, {
+      websocket: client,
+      mediaType: this.mediaType,
+      channelName: data.channelName
+    });
   }
 
   onBufferCreated(data) {

@@ -4,7 +4,7 @@
 
 import Event from '../events';
 import EventHandler from '../event-handler';
-import SlicesReader from '../utils/h264-nal-slicesreader.js';
+import PreProcesser from '../utils/preprocesser';
 
 class WebsocketLoader extends EventHandler {
 
@@ -14,14 +14,14 @@ class WebsocketLoader extends EventHandler {
       Event.WEBSOCKET_DATA_UPLOADING,
       Event.WEBSOCKET_MESSAGE_SENDING)
     this.buf = null;
-    this.slicesReader = new SlicesReader(wfs);
+    this.preProcesser = new PreProcesser(wfs);
     this.mediaType = undefined;
     this.channelName = undefined;
   }
 
   destroy() {
     !!this.client && this.client.close();
-    this.slicesReader.destroy();
+    this.preProcesser.destroy();
     EventHandler.prototype.destroy.call(this);
   }
 

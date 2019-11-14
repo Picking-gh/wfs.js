@@ -9,8 +9,7 @@ import MP4Remuxer from '../remux/mp4-remuxer';
 class h264Demuxer extends EventHandler {
 
   constructor(wfs, config = null) {
-    super(wfs,
-      Event.H264_DATA_PARSED);
+    super(wfs, Event.H264_DATA_PARSED);
 
     this.config = this.wfs.config || config;
     this.wfs = wfs;
@@ -42,6 +41,7 @@ class h264Demuxer extends EventHandler {
   }
 
   destroy() {
+    this.remuxer.destroy();
     EventHandler.prototype.destroy.call(this);
   }
 
