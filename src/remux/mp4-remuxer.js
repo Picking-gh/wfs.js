@@ -28,7 +28,7 @@ class MP4Remuxer {
     return false;
   }
 
-  destroy() {}
+  destroy() { }
 
   insertDiscontinuity() {
     this._initPTS = this._initDTS = undefined;
@@ -491,7 +491,7 @@ class MP4Remuxer {
               if (mp4SampleDuration < 0) {
                 mp4SampleDuration = lastFrameDuration;
               }
-              logger.log(`It is approximately ${deltaToFrameEnd/90} ms to the next segment; using duration ${mp4SampleDuration/90} ms for the last video frame.`);
+              logger.log(`It is approximately ${deltaToFrameEnd / 90} ms to the next segment; using duration ${mp4SampleDuration / 90} ms for the last video frame.`);
             } else {
               mp4SampleDuration = lastFrameDuration;
             }

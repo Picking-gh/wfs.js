@@ -1333,6 +1333,8 @@ var _eventHandler = _interopRequireDefault(require("../event-handler"));
 
 var _mp4Remuxer = _interopRequireDefault(require("../remux/mp4-remuxer"));
 
+var _logger = _interopRequireDefault(require("../utils/logger"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1570,7 +1572,7 @@ function (_EventHandler) {
       });
 
       if (debug || debugString.length) {
-        logger.log(debugString);
+        _logger.default.log(debugString);
       }
 
       pushAccesUnit();
@@ -1704,7 +1706,7 @@ function (_EventHandler) {
 var _default = h264Demuxer;
 exports.default = _default;
 
-},{"../event-handler":7,"../events":8,"../remux/mp4-remuxer":13,"./exp-golomb":4}],6:[function(require,module,exports){
+},{"../event-handler":7,"../events":8,"../remux/mp4-remuxer":13,"../utils/logger":14,"./exp-golomb":4}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
