@@ -5,6 +5,8 @@ import Event from '../events';
 import ExpGolomb from './exp-golomb';
 import EventHandler from '../event-handler';
 import MP4Remuxer from '../remux/mp4-remuxer';
+import logger from '../utils/logger';
+
 
 class h264Demuxer extends EventHandler {
 
@@ -104,7 +106,7 @@ class h264Demuxer extends EventHandler {
             debugString += 'NDR ';
           }
           break;
-          //IDR
+        //IDR
         case 5:
           push = true;
           if (debug) {
@@ -112,14 +114,14 @@ class h264Demuxer extends EventHandler {
           }
           key = true;
           break;
-          //SEI
+        //SEI
         case 6:
           unit.data = this.discardEPB(unit.data);
           expGolombDecoder = new ExpGolomb(unit.data);
           // skip frameType
           expGolombDecoder.readUByte();
           break;
-          //SPS
+        //SPS
         case 7:
           push = false;
           if (debug) {
@@ -148,7 +150,7 @@ class h264Demuxer extends EventHandler {
             push = true;
           }
           break;
-          //PPS
+        //PPS
         case 8:
           push = false;
           if (debug) {
@@ -221,7 +223,7 @@ class h264Demuxer extends EventHandler {
                 type: lastUnitType
               };
               units.push(unit);
-            } else {}
+            } else { }
             lastUnitStart = i;
             lastUnitType = unitType;
             state = 0;
@@ -275,7 +277,7 @@ class h264Demuxer extends EventHandler {
     newData = new Uint8Array(newLength);
     var sourceIndex = 0;
 
-    for (i = 0; i < newLength; sourceIndex++, i++) {
+    for (i = 0; i < newLength; sourceIndex++ , i++) {
       if (sourceIndex === EPBPositions[0]) {
         // Skip this byte
         sourceIndex++;
