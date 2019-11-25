@@ -5,6 +5,7 @@ import Event from '../events';
 import ExpGolomb from './exp-golomb';
 import EventHandler from '../event-handler';
 import MP4Remuxer from '../remux/mp4-remuxer';
+import logger from '../utils/logger';
 
 class h264Demuxer extends EventHandler {
 

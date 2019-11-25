@@ -41,9 +41,7 @@ class WebsocketLoader extends EventHandler {
     this.client.binaryType = 'arraybuffer';
     this.client.onmessage = this.receiveSocketMessage.bind(this);
     this.wfs.trigger(Event.WEBSOCKET_MESSAGE_SENDING, {
-      commandType: "open",
-      channelName: this.channelName,
-      commandValue: "NA"
+      channelName: this.channelName
     });
     console.log('Websocket Open!');
   }
@@ -61,11 +59,7 @@ class WebsocketLoader extends EventHandler {
   }
 
   onWebsocketMessageSending(event) {
-    this.client.send(JSON.stringify({
-      t: event.commandType,
-      c: event.channelName,
-      v: event.commandValue
-    }));
+    this.client.send(event.channelName);
   }
 
 }
