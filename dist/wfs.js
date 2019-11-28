@@ -1918,7 +1918,7 @@ var _events = _interopRequireDefault(require("../events"));
 
 var _eventHandler = _interopRequireDefault(require("../event-handler"));
 
-var _preprocesser = _interopRequireDefault(require("../utils/preprocesser"));
+var _preprocesser = _interopRequireDefault(require("../utils/preprocesser-1"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2018,7 +2018,7 @@ function (_EventHandler) {
 var _default = WebsocketLoader;
 exports.default = _default;
 
-},{"../event-handler":7,"../events":8,"../utils/preprocesser":15}],11:[function(require,module,exports){
+},{"../event-handler":7,"../events":8,"../utils/preprocesser-1":15}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

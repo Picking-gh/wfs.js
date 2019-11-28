@@ -5,7 +5,11 @@ html5 player for raw h.264 streams.
  
  It works by transmuxing H264 NAL unit into ISO BMFF (MP4) fragments.
 
- I removed the original websockets proxy server. I wrote another proxy to fetch and send h264 NAL units from rtsp streams. My server sends one or more complete NAL unit(s) at a time. So I simplified the original h264-nal-slicesreader.js as the unit always starts at the begining of a ws messages and h264-demuxer.js already does the proper search work. My server code is not based on the original one and is not included. The server side is much easier than this js code 😓.
+ I removed the original websocket server. It serves only h264 files. An alternative server could be a combination of `websocketd` + `openRTSP` + `live555ProxyServer` which serves rtsp streams. Originaly, `openRTSP` may devide a h264 NAL unit into several parts when sending via `stdout`. One needs to regroup these parts again in javascript, which is already coded in the orgiginal `wfs.js` (see `_read()` in `h264-nal-slicesreader.js`. In this fork I rename it to `preprocesser-2.js`). If one, like me, adds a wrapper to `openRTSP` that make it send one or more complete NAL unit(s) at a time, data can be sent to `h264-demuxer.js` directly, which means one can simplify the original `h264-nal-slicesreader.js` (in this fork I rename it to `preprocesser-1.js`). Switch is in `websocket-loader.js`.
+
+ The simplest websocket server combination may be `path/to/websocketd --binary=true --port=PORT path/to/openRTSP -v rtsp://the.stream`.
+
+ Note that `openRTSP` receives no `stdin` input. One can wrap it in other languages to get url via `stdin` or just modify its code. I tried `xargs` but it does not do.
 
  Other changes:
  
@@ -14,18 +18,31 @@ html5 player for raw h.264 streams.
  2. Added ws address when init a Wfs().
 
  3. Removed all file handle things. ONLY H264 allowed.
+
+ 4. Removed json structure sent to websocket server. Only url sent.
  
- 4. Changed to babel 7.
-    
+ 5. Changed to babel 7.
+
+## build wfs.js
+
+```sh
+cd wfs.js
+npm install
+npm run build
+```
+
+## web side usage
+
+See client directory. No http server in this fork. Just browse the html file after all IPs are properly set and your websocket server is started.
  
-##  Original see
+##  See also
 
-[wfs.js](https://github.com/ChihChengYang/wfs.js "wfs.js")
+* Original [wfs.js](https://github.com/ChihChengYang/wfs.js)
 
-[modified wfs.js](https://github.com/MarkRepo/wfs.js "modified wfs.js")
+* Modified [wfs.js](https://github.com/MarkRepo/wfs.js)
 
-	
-	
+* [websocetd](https://github.com/joewalnes/websocketd) is a small command-line tool that will wrap an existing command-line interface program, and allow it to be accessed via a WebSocket.
 
+* [openRTSP](http://www.live555.com/openRTSP/) is a command-line program that can be used to open, stream, receive, and (optionally) record media streams that are specified by a RTSP URL - i.e., an URL that begins with rtsp://.
 
- 
+* [live555ProxyServer](http://www.live555.com/proxyServer/) is a unicast RTSP server - built from the "LIVE555 Streaming Media" software - that acts as a 'proxy' for one or more 'back-end' unicast or multicast RTSP/RTP streams (i.e., served by other server(s)). 

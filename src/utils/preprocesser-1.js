@@ -1,5 +1,6 @@
 /*
  * Hook for processing attached data on H264 NAL unit data.
+ * Data passed to this module must be complete H264 NAL(s).
  */
 import Event from '../events';
 import EventHandler from '../event-handler';

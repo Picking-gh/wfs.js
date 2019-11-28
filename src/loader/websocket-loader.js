@@ -4,7 +4,7 @@
 
 import Event from '../events';
 import EventHandler from '../event-handler';
-import PreProcesser from '../utils/preprocesser';
+import PreProcesser from '../utils/preprocesser-1';
 
 class WebsocketLoader extends EventHandler {
 

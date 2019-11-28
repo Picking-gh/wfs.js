@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>RTSP Player</title>
+</head>
+
+<body>
+    <h2>RTSP Player</h2>
+    <script type="text/javascript" src="../dist/wfs.js"></script>
+    <div class="wfsjs">
+        <video id="video1" height="480" autoplay muted></video>
+        <video id="video2" height="480" autoplay muted></video>
+    </div>
+    <script>
+        window.onload = function () {
+            if (Wfs.isSupported()) {
+                var tv = document.getElementById("video1"),
+                    wfs_tv = new Wfs('192.168.10.10:12233');
+                wfs_tv.attachMedia(tv, 'rtsp://192.168.10.23:8554/proxyStream-1');
+                var ir = document.getElementById("video2"),
+                    wfs_ir = new Wfs('192.168.10.10:12233');
+                wfs_ir.attachMedia(ir, 'rtsp://192.168.10.23:8554/proxyStream-2');
+            }
+        };
+    </script>
+</body>
+
+</html>
