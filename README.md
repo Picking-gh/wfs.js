@@ -34,6 +34,8 @@ npm run build
 ## web side usage
 
 See client directory. No http server in this fork. Just browse the html file after all IPs are properly set and your websocket server is started.
+
+rtsp url is set in the html file. Yes, this is a normal player now.
  
 ##  See also
 
