@@ -9,7 +9,7 @@ html5 player for raw h.264 streams.
 
  The simplest websocket server combination may be `path/to/websocketd --binary=true --port=PORT path/to/openRTSP -v rtsp://the.stream`.
 
- Note that `openRTSP` receives no `stdin` input. One can wrap it in other languages to get url via `stdin` or just modify its code. I tried `xargs` but it does not do.
+ Note that `openRTSP` receives no `stdin` input. One can wrap it with some code to pass url from `websocketd` via `stdin` and transfer its `stdout` data to `websocketd`, or just modify its code. I tried `xargs` but it does not do. `xargs` does not transfer the `stdout`.
 
  Other changes:
  
